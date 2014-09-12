@@ -16,6 +16,7 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
+	defer f.Close()
 	pike, _, err = image.Decode(f)
 	if err != nil {
 		panic(err)
