@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/nfnt/resize"
@@ -57,16 +58,25 @@ func love(w http.ResponseWriter, r *http.Request) {
 
 	start := time.Now()
 
-	for i, url := range types.Nuggets {
-		x := startX - (i/4)*120
-		y := startY + (i%4)*110
+	var wg sync.WaitGroup
+	wg.Add(len(types.Nuggets))
 
-		nugget, err := fetchReziedImage(url)
-		if err != nil {
-			panic(err)
-		}
-		draw.Draw(target, image.Rect(x, y, x+width, y+height), nugget, image.ZP, draw.Src)
+	for i := range types.Nuggets {
+		go func(i int) {
+			x := startX - (i/4)*120
+			y := startY + (i%4)*110
+
+			url := types.Nuggets[i]
+			nugget, err := fetchReziedImage(url)
+			if err != nil {
+				panic(err)
+			}
+			draw.Draw(target, image.Rect(x, y, x+width, y+height), nugget, image.ZP, draw.Src)
+			wg.Done()
+		}(i)
 	}
+
+	wg.Wait()
 
 	log.Printf("total time taken: %v", time.Since(start))
 
