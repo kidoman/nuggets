@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"image"
 	_ "image/jpeg"
 	"image/png"
+	"io"
 	"net/http"
 	"os"
 )
@@ -27,7 +27,12 @@ func init() {
 }
 
 func yum(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Yum yum yum!")
+	f, err := os.Open("index.html")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	io.Copy(w, f)
 }
 
 func love(w http.ResponseWriter, r *http.Request) {
