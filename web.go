@@ -2,11 +2,23 @@ package main
 
 import (
 	"image"
+	"image/draw"
 	_ "image/jpeg"
 	"image/png"
 	"io"
 	"net/http"
 	"os"
+
+	"github.com/kidoman/nuggets/types"
+
+	"github.com/nfnt/resize"
+)
+
+const (
+	width  = 100
+	height = 100
+	startX = (624 - width - 20)
+	startY = 25
 )
 
 var pike image.Image
@@ -36,5 +48,33 @@ func yum(w http.ResponseWriter, r *http.Request) {
 }
 
 func love(w http.ResponseWriter, r *http.Request) {
-	png.Encode(w, pike)
+	target := image.NewRGBA(image.Rect(0, 0, 624, 480))
+	draw.Draw(target, pike.Bounds(), pike, image.ZP, draw.Src)
+
+	for i, url := range types.Nuggets {
+		x := startX - (i/4)*120
+		y := startY + (i%4)*110
+
+		nugget, err := fetchReziedImage(url)
+		if err != nil {
+			panic(err)
+		}
+		draw.Draw(target, image.Rect(x, y, x+width, y+height), nugget, image.ZP, draw.Src)
+	}
+
+	png.Encode(w, target)
+}
+
+func fetchReziedImage(url string) (image.Image, error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	nugget, _, err := image.Decode(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	nugget = resize.Resize(width, height, nugget, resize.Lanczos3)
+	return nugget, nil
 }
