@@ -9,9 +9,11 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/kidoman/nuggets/types"
-
 	"github.com/nfnt/resize"
+
+	"github.com/kidoman/nuggets/types"
+	_ "github.com/kidoman/nuggets/types/set1"
+	// _ "github.com/kidoman/nuggets/types/set2"
 )
 
 const (
