@@ -15,7 +15,7 @@ import (
 
 	"github.com/kidoman/nuggets/types"
 	_ "github.com/kidoman/nuggets/types/set1"
-	// _ "github.com/kidoman/nuggets/types/set2"
+	_ "github.com/kidoman/nuggets/types/set2"
 )
 
 const (
