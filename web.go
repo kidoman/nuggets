@@ -63,16 +63,17 @@ func love(w http.ResponseWriter, r *http.Request) {
 
 	for i := range types.Nuggets {
 		go func(i int) {
+			defer wg.Done()
+
 			x := startX - (i/4)*120
 			y := startY + (i%4)*110
 
 			url := types.Nuggets[i]
 			nugget, err := fetchReziedImage(url)
 			if err != nil {
-				panic(err)
+				return
 			}
 			draw.Draw(target, image.Rect(x, y, x+width, y+height), nugget, image.ZP, draw.Src)
-			wg.Done()
 		}(i)
 	}
 
